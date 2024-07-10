@@ -1,0 +1,109 @@
+body {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: 'Titillium Web', sans-serif;
+}
+
+h2 {
+    font-weight: 600;
+}
+
+.navbar-brand {
+    color: #ff0000 !important;
+}
+
+.navbar-nav .nav-link {
+    color: #ffffff !important;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ff0000 !important;
+}
+
+.btn-primary {
+    background-color: #ff0000;
+    border-color: #ff0000;
+}
+
+.btn-primary:hover {
+    background-color: #cc0000;
+    border-color: #cc0000;
+}
+
+.form-control {
+    background-color: #333333;
+    color: #ffffff;
+    border: 1px solid #555555;
+    font-family: sans-serif;
+}
+
+.form-control:focus {
+    background-color: #333333;
+    color: #ffffff;
+    border-color: #ff0000;
+}
+
+.alert-success {
+    background-color: #28a745;
+    color: #ffffff;
+}
+
+.alert-danger {
+    background-color: #dc3545;
+    color: #ffffff;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+/* New styles for shop page */
+.product {
+    cursor: pointer;
+    margin-bottom: 2rem;
+    margin: 5px;
+    padding: 10px;
+    background-color: #333333;
+}
+
+.img-fit {
+    background-color: #333333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.img-fit img {
+    transition: 0.3s all;
+    flex-shrink: 0;
+    min-width: 100%;
+    min-height: 100%;
+}
+
+.product:hover img {
+    opacity: 0.7;
+}
+
+.pagination {
+    justify-content: center;
+}
+
+.pagination>li.disabled>a {
+    background: #434141 !important;
+    color: #b00101 !important;
+}
+
+.pagination .page-item .page-link {
+    background: #333333;
+    border-color: #555555;
+    color: #ff0000;
+}
+
+.pagination .page-item .page-link:hover {
+    background: #ff0000;
+    color: #ffffff;
+}
