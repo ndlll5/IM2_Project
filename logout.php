@@ -1,6 +1,7 @@
-<?php   
-session_start(); //to ensure you are using same session
-session_destroy(); //destroy the session
-header("location:/login.php"); //to redirect back to "login.php" after logging out
+<?php
+session_start();
+session_unset();
+session_destroy();
+header("Location: login.php");
 exit();
 ?>

@@ -21,8 +21,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         session_start();
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'];  // Store is_admin in session
-        header("Location: admin/index.php");
+        $_SESSION['role'] = $user['role'];  // Store role in session
+
+        // Redirect based on role
+        if ($user['role'] == 'admin') {
+            header("Location: admin/index.php");
+        } else {
+            header("Location: shop/shop.php");
+        }
         exit();
     } else {
         echo "<div class='alert alert-danger'>Invalid email or password</div>";

@@ -24,6 +24,7 @@ function getProducts($conn, $filterCategory, $startRow, $rowPerPage) {
     return $query->fetch_all(MYSQLI_ASSOC);
 }
 
+
 // Function to count total products
 function getTotalProducts($conn, $filterCategory) {
     $filterCondition = $filterCategory ? "WHERE category_id = $filterCategory" : '';
@@ -35,6 +36,16 @@ function getTotalProducts($conn, $filterCategory) {
 }
 
 $categories = getCategories($conn);
+
+// Function to fetch product items based on product_id
+function getProductItems($conn, $product_id) {
+    $query = $conn->prepare("SELECT * FROM product_item WHERE product_id = ?");
+    $query->bind_param("i", $product_id);
+    $query->execute();
+    $result = $query->get_result();
+    $items = $result->fetch_all(MYSQLI_ASSOC);
+    return $items;
+}
 
 // Determine current page
 $currentPage = isset($_GET['pageNum']) ? intval($_GET['pageNum']) : 1;
@@ -60,6 +71,7 @@ function getCategoryName($categories, $categoryId) {
 
 // Determine selected category name
 $selectedCategoryName = getCategoryName($categories, $filterCategory);
+
 ?>
 
 <!DOCTYPE html>
@@ -73,90 +85,9 @@ $selectedCategoryName = getCategoryName($categories, $filterCategory);
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom styles -->
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="css/style.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            background-color: #1a1a1a;
-            font-family: 'Titillium Web', sans-serif;
-            color: #ffffff;
-        }
-        .card {
-            background-color: #2c2c2c;
-            border: 1px solid #3d3d3d;
-            border-radius: 8px;
-            transition: transform 0.2s ease-in-out;
-            height: 100%;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
-        }
-        .card-img-top {
-            height: 200px;
-            object-fit: cover;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-        }
-        .card-title {
-            color: #ffffff;
-            font-weight: bold;
-            font-size: 18px;
-        }
-        .card-text {
-            color: #e0e0e0;
-            font-size: 14px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .pagination {
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .btn {
-            background-color: #2c2c2c;
-            border-color: #3d3d3d;
-            color: #ffffff;
-        }
-        .btn:hover {
-            background-color: #444;
-        }
-        .category-card {
-            max-height: 500px;
-            overflow-y: auto;
-            background-color: #2c2c2c;
-            border: 1px solid #3d3d3d;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            width: 100%;
-            margin-left: -100px; /* Adjust left margin */
-            margin-top: 110px;  /* Adjust top margin */
-        }
-        .category-card h5 {
-            color: #ffffff;
-            font-weight: bold;
-        }
-        .category-card .nav-link {
-            color: #e0e0e0;
-            font-size: 16px;
-        }
-        .category-card .nav-link:hover {
-            color: #ffffff;
-        }
-        .category-card::-webkit-scrollbar {
-            width: 8px;
-        }
-        .category-card::-webkit-scrollbar-thumb {
-            background-color: #3d3d3d;
-            border-radius: 4px;
-        }
-        .category-card::-webkit-scrollbar-track {
-            background-color: #2c2c2c;
-        }
-    </style>
 </head>
 <body>
     <div class="container-fluid">
@@ -190,7 +121,7 @@ $selectedCategoryName = getCategoryName($categories, $filterCategory);
                                     <div class="card-body">
                                         <h5 class="card-title"><?php echo $product['name']; ?></h5>
                                         <p class="card-text"><?php echo (strlen($product['description']) > 100) ? substr($product['description'], 0, 100) . '...' : $product['description']; ?></p>
-                                        <a href="#" class="btn">View Details</a>
+                                        <button type="button" class="btn mb-3 view-details-btn" data-toggle="modal" data-target="#details_<?php echo $product['product_id']; ?>" data-id="<?php echo $product['product_id']; ?>" data-name="<?php echo $product['name']; ?>">View Details</button>
                                     </div>
                                 </div>
                             </div>
@@ -221,7 +152,182 @@ $selectedCategoryName = getCategoryName($categories, $filterCategory);
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
+   <!-- view more -->
+<?php foreach ($products as $product): ?>
+    <div class="modal fade" id="details_<?php echo $product['product_id']; ?>" tabindex="-1" role="dialog" aria-labelledby="details_<?php echo $product['product_id']; ?>Label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content bg-dark">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="details_<?php echo $product['product_id']; ?>Label"><?php echo $product['name']; ?></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body m-4">
+                    <?php
+                        $productItems = getProductItems($conn, $product['product_id']);
+                    ?>
+                    <div class="d-flex align-items-start">
+                        <div class="carousel-box w-50" align="center">
+                            <div id="carousel_<?php echo $product['product_id']; ?>" class="carousel slide" data-ride="carousel" data-interval="false">
+                                <div class="carousel-inner">
+                                    <?php $firstItem = true; ?>
+                                    <?php foreach ($productItems as $index => $item): ?>
+                                        <div class="carousel-item <?php echo $firstItem ? 'active' : ''; ?>" data-price="<?php echo $item['price']; ?>" data-stock="<?php echo $item['stock_qty']; ?>" data-name="<?php echo $item['name']; ?>" data-item-id="<?php echo $item['item_id']; ?>">
+                                            <img src="../uploads/<?php echo $item['product_image']; ?>" class="d-block" id="display-image" alt="<?php echo $item['name']; ?>">
+                                        </div>
+                                        <?php $firstItem = false; ?>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <a class="carousel-control-prev" href="#carousel_<?php echo $product['product_id']; ?>" role="button" data-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden"></span>
+                            </a>
+                            <a class="carousel-control-next" href="#carousel_<?php echo $product['product_id']; ?>" role="button" data-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden"></span>
+                            </a>
+                        </div>
+
+                        <div class="item-info w-50 ml-3 pt-3">
+                            <h1 id="item-name"><?php echo $productItems[0]['name']; ?></h1>
+                            <hr style="background-color: #f0f0f0; border-top: 1px solid #555555;" />
+                            <p><?php echo (strlen($product['description']) > 100) ? substr($product['description'], 0, 100) . '...' : $product['description']; ?></p>
+                            <h2 id="item-price">Price: ₱<?php echo $productItems[0]['price']; ?></h2>
+                            <p id="item-stock">Stock: <?php echo $productItems[0]['stock_qty']; ?></p>
+                            <div>
+                                <form id="add-to-cart-form">
+                                    <div class="form-group">
+                                        <label for="quantity">Quantity:</label>
+                                        <div class="input-group col-xs-12 col-md-6">
+                                            <div class="input-group-prepend">
+                                                <button type="button" class="btn quantity-button" data-type="minus">-</button>
+                                            </div>
+                                            <input type="number" id="quantity" name="quantity" class="form-control text-center quantity-input" value="1" min="1" max="<?php echo $productItems[0]['stock_qty']; ?>">
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn quantity-button" data-type="plus">+</button>
+                                            </div>
+                                        </div>  
+                                    </div>
+                                    <input type="hidden" id="product-id" name="product_id" value="<?php echo $product['product_id']; ?>">
+                                    <input type="hidden" id="item-id" name="item_id" value="<?php echo $productItems[0]['item_id']; ?>">
+                                    <button type="button" class="btn add-to-cart-btn" data-product-id="<?php echo $product['product_id']; ?>" data-item-id="<?php echo $productItems[0]['item_id']; ?>">Add to Cart</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col-md-12">
+                            <h5 class="text-light">Please select an item:</h5>
+                            <ul class="list-inline text-center">
+                                <?php foreach ($productItems as $index => $item): ?>
+                                    <li class="list-inline-item">
+                                        <a href="#carousel_<?php echo $product['product_id']; ?>" data-slide-to="<?php echo $index; ?>" class="<?php echo $index === 0 ? 'active' : ''; ?>">
+                                            <img src="../uploads/<?php echo $item['product_image']; ?>" class="img-thumbnail" alt="<?php echo $item['name']; ?>">
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endforeach; ?>
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+
+    <script>
+$(document).ready(function() {
+    // Function to update item info
+    function updateItemInfo(activeItem) {
+        var price = activeItem.data('price');
+        var stock = activeItem.data('stock');
+        var name = activeItem.data('name');
+        var itemId = activeItem.data('item-id');
+        var modal = activeItem.closest('.modal');
+        modal.find('#item-price').text('Price: ₱' + price);
+        modal.find('#item-stock').text('Stock: ' + stock);
+        modal.find('#item-name').text(name);
+        modal.find('#quantity').attr('max', stock);
+        modal.find('#item-id').val(itemId);
+    }
+
+    // view details button
+    $('.view-details-btn').click(function() {
+        var productId = $(this).data('id');
+        var productName = $(this).data('name');
+        var modal = $('#details_' + productId);
+        modal.find('.modal-title').text(productName);
+
+        // Initialize the item info for the first active item
+        var initialActiveItem = modal.find('.carousel-item.active');
+        updateItemInfo(initialActiveItem);
+    });
+
+    // Listen to the carousel slide event
+    $('.carousel').on('slid.bs.carousel', function () {
+        var activeItem = $(this).find('.carousel-item.active');
+        updateItemInfo(activeItem);
+    });
+
+    $('.quantity-button').click(function() {
+        var type = $(this).data('type');
+        var input = $(this).closest('.input-group').find('input[name="quantity"]');
+        var currentVal = parseInt(input.val());
+        if (type === 'minus' && currentVal > input.attr('min')) {
+            input.val(currentVal - 1).change();
+        } else if (type === 'plus' && currentVal < input.attr('max')) {
+            input.val(currentVal + 1).change();
+        }
+    });
+
+    $('input[name="quantity"]').change(function() {
+        var valueCurrent = parseInt($(this).val());
+        var minValue = parseInt($(this).attr('min'));
+        var maxValue = parseInt($(this).attr('max'));
+        if (valueCurrent >= minValue) {
+            $(".quantity-button[data-type='minus']").removeAttr('disabled');
+        } else {
+            $(this).val(minValue);
+        }
+        if (valueCurrent <= maxValue) {
+            $(".quantity-button[data-type='plus']").removeAttr('disabled');
+        } else {
+            $(this).val(maxValue);
+        }
+    });
+
+    $('.add-to-cart-btn').click(function() {
+        var form = $(this).closest('form');
+        var productId = form.find('input[name="product_id"]').val();
+        var itemId = form.find('input[name="item_id"]').val();
+        var quantity = form.find('input[name="quantity"]').val();
+
+        $.post('add_to_cart.php', {
+            product_id: productId,
+            item_id: itemId,
+            quantity: quantity
+        }, function(response) {
+            var result = JSON.parse(response);
+            if (result.status === 'success') {
+                alert(result.message);
+            } else {
+                alert(result.message);
+            }
+        });
+    });
+});
+</script>
+
+
+
+
+    <?php
+        include 'footer.php';
+    ?>

@@ -129,7 +129,7 @@
         <div class="side-bar-contents mt-3">
             <a class="side-bar-item text-nowrap" href="index.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a class="side-bar-item text-nowrap" href="products.php"><i class = "fas fa-box-open"></i> Products</a>
-            <a class="side-bar-item text-nowrap" href="#"><i class="fas fa-shopping-cart"></i> Orders</a>
+            <a class="side-bar-item text-nowrap" href="orders.php"><i class="fas fa-shopping-cart"></i> Orders</a>
             <a class="side-bar-item text-nowrap" href="#"><i class="fas fa-credit-card"></i> Payments</a>
             <a class="side-bar-item text-nowrap" href="users.php"><i class="fas fa-users"></i> Users</a>
         </div>
@@ -137,8 +137,9 @@
     
     <div id="top">
         <nav class="navbar navbar-expand-lg navbar-custom">
-            <button class="openbtn" onclick="openNav()">☰ </button>  
-            <button class="btn btn-outline-danger text-nowrap" id="logout"><i class="fas fa-sign-out-alt"></i> Log Out</button>
+            <button class="openbtn" onclick="openNav()">☰</button>
+            <a class="btn btn-outline-danger text-nowrap" id="logout" href="../logout.php"><i class="fas fa-sign-out-alt"></i> Log Out</a>
         </nav>
     </div>
     <div id="main">
+      

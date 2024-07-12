@@ -1,5 +1,8 @@
 <?php
     session_start();
+    include '../db_connect.php';
+    $current_page = basename($_SERVER['PHP_SELF']);
+    $pages_without_search = ['contact.php', 'profile.php'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,6 +17,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
         .navbar-custom {
             background-color: #000; /* Black background */
@@ -37,35 +41,44 @@
             background-color: #ff0000; /* Red background on hover */
             color: #fff; /* White text on hover */
         }
+        
+        .text-light:hover {
+            color: #FFC107; 
+        }
+ 
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-custom">
-    <a class="navbar-brand" href="#">
+    <a class="navbar-brand" href="shop.php">
         <img src="../assets/logo.png" height="55" class="d-inline-block align-top" alt="">
     </a>
     <!-- <a class="navbar-brand" href="#">Motoracer</a> -->
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
+        <?php if (!in_array($current_page, $pages_without_search)): ?>
             <div class="flex-grow-1 d-flex">
-                <form class="form-inline flex-nowrap mx-0 mx-lg-auto rounded p-1">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search">
+                <form class="form-inline flex-nowrap mx-0 mx-lg-auto rounded p-1" action="shop.php" method="GET">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search" name="search_query">
                     <button class="btn btn-outline-danger" type="submit">Search</button>
                 </form>
             </div>
+        <?php endif; ?>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Contact<span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="contact.php">Contact<span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Cart</a>
+                    <a class="nav-link" href="cart.php">Cart</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="profile.php">Account</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../logout.php">Logout</a>
+                </li>
             </ul>
         </div>
     </nav>
-    <div class="container mt-5 flex-grow-1">
+    <div class="container mt-2 flex-grow-1">
