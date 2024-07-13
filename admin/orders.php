@@ -1,15 +1,38 @@
 <?php
 include '../db_connect.php';
 
-// Fetch all orders
-$sql = "SELECT * FROM shop_order";
-$result = $conn->query($sql);
+// Pagination and search settings
+$limit = 10; // Number of rows per page
+$page = isset($_GET['page']) ? $_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+$search = isset($_GET['search']) ? $_GET['search'] : '';
 
-if ($result->num_rows > 0) {
-    $orders = $result->fetch_all(MYSQLI_ASSOC);
+// Fetch orders for display with search functionality
+$order_query = "SELECT shop_order.*, user.username, CONCAT(user.firstname, ' ', user.lastname) AS full_name 
+                FROM shop_order 
+                JOIN user ON shop_order.user_id = user.user_id 
+                WHERE user.username LIKE '%$search%' 
+                OR CONCAT(user.firstname, ' ', user.lastname) LIKE '%$search%' 
+                OR shop_order.order_status LIKE '%$search%'
+                LIMIT $limit OFFSET $offset";
+$order_result = mysqli_query($conn, $order_query);
+if ($order_result) {
+    $orders = mysqli_fetch_all($order_result, MYSQLI_ASSOC);
 } else {
+    echo "Error fetching orders: " . mysqli_error($conn);
     $orders = [];
 }
+
+// Fetch total number of orders for pagination
+$total_query = "SELECT COUNT(*) as total 
+                FROM shop_order 
+                JOIN user ON shop_order.user_id = user.user_id 
+                WHERE user.username LIKE '%$search%' 
+                OR CONCAT(user.firstname, ' ', user.lastname) LIKE '%$search%' 
+                OR shop_order.order_status LIKE '%$search%'";
+$total_result = mysqli_query($conn, $total_query);
+$total_rows = mysqli_fetch_assoc($total_result)['total'];
+$total_pages = ceil($total_rows / $limit);
 ?>
 
 <!DOCTYPE html>
@@ -17,25 +40,39 @@ if ($result->num_rows > 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Orders</title>
+    <title>Orders</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/styles.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
         .modal-content {
-        background-color: #343a40; /* Dark background color */
-        color: white; /* White text color */
+            background-color: #343a40; /* Dark background color */
+            color: white; /* White text color */
         }
     </style>
 </head>
-<body class = "bg-dark text-white">
+<body class="bg-dark text-white">
     <?php include 'navbar.php'; ?>
     <div class="container">
-        <h1 class="mt-5">Manage Orders</h1>
-        <table class="table table-striped text-white">
+        <h1 class="mt-5">Orders</h1>
+
+        <div class="row">
+            <div class="col mb-3">
+                <!-- Search form -->
+                <form class="form-inline" method="GET" action="orders.php">
+                    <input class="form-control mr-2" type="search" name="search" placeholder="Search orders" aria-label="Search" value="<?php echo htmlspecialchars($search); ?>">
+                    <button class="btn btn-outline-light btn-sm" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Table to display existing orders -->
+        <table class="table table-dark table-striped">
             <thead>
                 <tr>
                     <th>Order ID</th>
-                    <th>User ID</th>
+                    <th>Username</th>
+                    <th>Full Name</th>
                     <th>Order Date</th>
                     <th>Total Amount</th>
                     <th>Status</th>
@@ -46,7 +83,8 @@ if ($result->num_rows > 0) {
                 <?php foreach ($orders as $order): ?>
                 <tr>
                     <td><?php echo $order['shop_order_id']; ?></td>
-                    <td><?php echo $order['user_id']; ?></td>
+                    <td><?php echo $order['username']; ?></td>
+                    <td><?php echo $order['full_name']; ?></td>
                     <td><?php echo $order['order_date']; ?></td>
                     <td>₱<?php echo number_format($order['order_total'], 2); ?></td>
                     <td><?php echo $order['order_status']; ?></td>
@@ -55,6 +93,21 @@ if ($result->num_rows > 0) {
                 <?php endforeach; ?>
             </tbody>
         </table>
+
+        <!-- Pagination controls -->
+        <nav>
+            <ul class="pagination justify-content-center">
+                <?php if ($page > 1): ?>
+                    <li class="page-item"><a class="page-link" href="orders.php?page=<?php echo $page - 1; ?>&search=<?php echo htmlspecialchars($search); ?>">Previous</a></li>
+                <?php endif; ?>
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                    <li class="page-item <?php if ($i == $page) echo 'active'; ?>"><a class="page-link" href="orders.php?page=<?php echo $i; ?>&search=<?php echo htmlspecialchars($search); ?>"><?php echo $i; ?></a></li>
+                <?php endfor; ?>
+                <?php if ($page < $total_pages): ?>
+                    <li class="page-item"><a class="page-link" href="orders.php?page=<?php echo $page + 1; ?>&search=<?php echo htmlspecialchars($search); ?>">Next</a></li>
+                <?php endif; ?>
+            </ul>
+        </nav>
     </div>
     <?php include 'footer.php'; ?>
 </body>

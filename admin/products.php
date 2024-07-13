@@ -51,9 +51,17 @@ if (isset($_GET['delete'])) {
     }
 }
 
-// Fetch products for display
+// Pagination and search settings
+$limit = 10; // Number of rows per page
+$page = isset($_GET['page']) ? $_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+$search = isset($_GET['search']) ? $_GET['search'] : '';
+
+// Fetch products for display with search functionality
 $product_query = "SELECT product.*, product_category.category_name AS category_name FROM product 
-                  JOIN product_category ON product.category_id = product_category.category_id";
+                  JOIN product_category ON product.category_id = product_category.category_id
+                  WHERE product.name LIKE '%$search%'
+                  LIMIT $limit OFFSET $offset";
 $product_result = mysqli_query($conn, $product_query);
 if ($product_result) {
     $products = mysqli_fetch_all($product_result, MYSQLI_ASSOC);
@@ -61,6 +69,12 @@ if ($product_result) {
     echo "Error fetching products: " . mysqli_error($conn);
     $products = [];
 }
+
+// Fetch total number of products for pagination
+$total_query = "SELECT COUNT(*) as total FROM product WHERE name LIKE '%$search%'";
+$total_result = mysqli_query($conn, $total_query);
+$total_rows = mysqli_fetch_assoc($total_result)['total'];
+$total_pages = ceil($total_rows / $limit);
 
 // Fetch categories for the dropdown
 $category_query = "SELECT category_id, category_name FROM product_category";
@@ -84,8 +98,8 @@ if ($category_result) {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
         .modal-content {
-        background-color: #343a40; /* Dark background color */
-        color: white; /* White text color */
+            background-color: #343a40; /* Dark background color */
+            color: white; /* White text color */
         }
     </style>
 </head>
@@ -94,10 +108,21 @@ if ($category_result) {
     <div class="container">
         <h1 class="mt-5">Products</h1>
 
-        <!-- Button to open the Add Product modal -->
-        <button type="button" class="btn mb-3" data-toggle="modal" data-target="#productModal" onclick="clearProductForm();">
-            Add Product
-        </button>
+        <div class="row">
+            <div class="col mb-3">
+                <!-- Search form -->
+                <form class="form-inline" method="GET" action="products.php">
+                    <input class="form-control mr-2" type="search" name="search" placeholder="Search products" aria-label="Search" value="<?php echo htmlspecialchars($search); ?>">
+                    <button class="btn btn-outline-light btn-sm" type="submit">Search</button>
+                </form>
+            </div>
+            <div class="col text-right">
+                <!-- Button to open the Add Product modal -->
+                <button type="button" class="btn btn-sm" data-toggle="modal" data-target="#productModal" onclick="clearProductForm();">
+                    Add Product
+                </button>
+            </div>
+        </div>
 
         <!-- Table to display existing products -->
         <table class="table table-dark table-striped">
@@ -128,6 +153,21 @@ if ($category_result) {
                 <?php endforeach; ?>
             </tbody>
         </table>
+
+        <!-- Pagination controls -->
+        <nav>
+            <ul class="pagination justify-content-center">
+                <?php if ($page > 1): ?>
+                    <li class="page-item"><a class="page-link" href="products.php?page=<?php echo $page - 1; ?>&search=<?php echo htmlspecialchars($search); ?>">Previous</a></li>
+                <?php endif; ?>
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                    <li class="page-item <?php if ($i == $page) echo 'active'; ?>"><a class="page-link" href="products.php?page=<?php echo $i; ?>&search=<?php echo htmlspecialchars($search); ?>"><?php echo $i; ?></a></li>
+                <?php endfor; ?>
+                <?php if ($page < $total_pages): ?>
+                    <li class="page-item"><a class="page-link" href="products.php?page=<?php echo $page + 1; ?>&search=<?php echo htmlspecialchars($search); ?>">Next</a></li>
+                <?php endif; ?>
+            </ul>
+        </nav>
     </div>
 
     <!-- Modal for adding/editing products -->

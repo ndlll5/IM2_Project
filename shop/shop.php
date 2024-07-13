@@ -117,7 +117,7 @@ $selectedCategoryName = getCategoryName($categories, $filterCategory);
                         <?php foreach ($products as $product): ?>
                             <div class="col-lg-4 col-md-6 mb-2">
                                 <div class="card">
-                                    <img src="../uploads/<?php echo $product['product_image']; ?>" class="card-img-top" alt="<?php echo $product['name']; ?>">
+                                    <img src="../uploads/<?php echo $product['product_image']; ?>" class="card-img-top bg-dark" alt="<?php echo $product['name']; ?>">
                                     <div class="card-body">
                                         <h5 class="card-title"><?php echo $product['name']; ?></h5>
                                         <p class="card-text"><?php echo (strlen($product['description']) > 100) ? substr($product['description'], 0, 100) . '...' : $product['description']; ?></p>
