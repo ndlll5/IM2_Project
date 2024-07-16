@@ -1,6 +1,13 @@
 <?php 
 include '../db_connect.php';
 
+session_start();
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
+
 // Query to count pending orders
 $sql_pending = "SELECT COUNT(*) as pending_orders FROM shop_order WHERE order_status = 'pending'";
 $result_pending = $conn->query($sql_pending);
@@ -19,8 +26,6 @@ $result_completed = $conn->query($sql_completed);
 $row_completed = $result_completed->fetch_assoc();
 $completed_orders = $row_completed['completed_orders'];
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,68 +36,46 @@ $completed_orders = $row_completed['completed_orders'];
     <link href="assets/css/styles.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
-
         .card-custom .card-body {
             background-color: #FFC107;
             color: #343A40;
             border: none;
         }
-
     </style>
 </head>
-
 <body class="bg-dark text-white">
     <?php include 'navbar.php'; ?>
-    <!-- <div class="container">
-        <h1 class="mt-5">Admin Panel</h1>
-        <ul class="list-group mt-3">
-            <li class="list-group-item bg-secondary">
-                <a href="products.php" class="text-white">Manage Products</a>
-            </li>
-            <li class="list-group-item bg-secondary">
-                <a href="admin/orders.php" class="text-white">Manage Orders</a>
-            </li>
-            <li class="list-group-item bg-secondary">
-                <a href="admin/payments.php" class="text-white">Manage Payments</a>
-            </li>
-            <li class="list-group-item bg-secondary">
-                <a href="admin/users.php" class="text-white">Manage Users</a>
-            </li>
-        </ul>
-    </div> -->
-
-<div class="container">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="mt-2">Dashboard</h1>
-            </div>
-            <div class="row mb-4">
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card card-custom border-0">
-                        <div class="card-body rounded-lg">
-                            <h5 class="card-title">Pending Orders</h5>
-                            <h3 class="card-text"><?php echo $pending_orders; ?></h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card card-custom border-0">
-                        <div class="card-body rounded-lg">
-                            <h5 class="card-title">Cancelled Orders</h5>
-                            <h3 class="card-text"><?php echo $cancelled_orders; ?></h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card card-custom border-0">
-                        <div class="card-body rounded-lg">
-                            <h5 class="card-title">Completed Orders</h5>
-                            <h3 class="card-text"><?php echo $completed_orders; ?></h3>
-                        </div>
+    <div class="container">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="mt-2">Dashboard</h1>
+        </div>
+        <div class="row mb-4">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card card-custom border-0">
+                    <div class="card-body rounded-lg">
+                        <h5 class="card-title">Pending Orders</h5>
+                        <h3 class="card-text"><?php echo $pending_orders; ?></h3>
                     </div>
                 </div>
             </div>
-
-    
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card card-custom border-0">
+                    <div class="card-body rounded-lg">
+                        <h5 class="card-title">Cancelled Orders</h5>
+                        <h3 class="card-text"><?php echo $cancelled_orders; ?></h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card card-custom border-0">
+                    <div class="card-body rounded-lg">
+                        <h5 class="card-title">Completed Orders</h5>
+                        <h3 class="card-text"><?php echo $completed_orders; ?></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <?php include 'footer.php'; ?>
 </body>
 </html>

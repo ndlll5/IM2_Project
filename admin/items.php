@@ -166,9 +166,9 @@ if ($item_result) {
                 <?php endforeach; ?>
             </tbody>
         </table>
-        <button type="button" class="btn mb-3" onclick="window.history.back();">
+        <a type="button" class="btn mb-3" href="products.php">
             Back to Products
-        </button>
+                </a>
     </div>
 
     <!-- Modal for adding/editing items -->

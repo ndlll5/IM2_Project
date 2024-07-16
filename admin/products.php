@@ -37,17 +37,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (isset($_GET['delete'])) {
     $product_id = $_GET['delete'];
 
-    // Delete all items associated with the product
-    $delete_items_query = "DELETE FROM product_item WHERE product_id='$product_id'";
-    mysqli_query($conn, $delete_items_query);
+    // Start transaction
+    mysqli_begin_transaction($conn);
 
-    // Delete the product
-    $delete_product_query = "DELETE FROM product WHERE product_id='$product_id'";
-    if (mysqli_query($conn, $delete_product_query)) {
+    try {
+        // Fetch product items to delete orderlines
+        $fetch_items_query = "SELECT item_id FROM product_item WHERE product_id='$product_id'";
+        $items_result = mysqli_query($conn, $fetch_items_query);
+
+        if (!$items_result) {
+            throw new Exception("Error fetching product items: " . mysqli_error($conn));
+        }
+
+        $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
+
+        foreach ($items as $item) {
+            $item_id = $item['item_id'];
+
+            // Delete all orderlines associated with the product items
+            $delete_orderlines_query = "DELETE FROM orderline WHERE product_item_id='$item_id'";
+            if (!mysqli_query($conn, $delete_orderlines_query)) {
+                throw new Exception("Error deleting orderlines: " . mysqli_error($conn));
+            }
+        }
+
+        // Delete all items associated with the product
+        $delete_items_query = "DELETE FROM product_item WHERE product_id='$product_id'";
+        if (!mysqli_query($conn, $delete_items_query)) {
+            throw new Exception("Error deleting product items: " . mysqli_error($conn));
+        }
+
+        // Delete the product
+        $delete_product_query = "DELETE FROM product WHERE product_id='$product_id'";
+        if (!mysqli_query($conn, $delete_product_query)) {
+            throw new Exception("Error deleting product: " . mysqli_error($conn));
+        }
+
+        // Commit transaction
+        mysqli_commit($conn);
         header("Location: products.php");
         exit();
-    } else {
-        echo "Error: " . mysqli_error($conn);
+    } catch (Exception $e) {
+        // Rollback transaction on error
+        mysqli_rollback($conn);
+        echo $e->getMessage();
+        exit();
     }
 }
 
@@ -145,14 +179,17 @@ if ($category_result) {
                         <td><?php echo $product['description']; ?></td>
                         <td><img src="../uploads/<?php echo $product['product_image']; ?>" alt="Product Image" style="width: 50px; height: auto;"></td>
                         <td>
-                            <button class="btn btn-sm" onclick="editProduct(<?php echo htmlspecialchars(json_encode($product)); ?>);">Edit</button>
-                            <a href="products.php?delete=<?php echo $product['product_id']; ?>" class="btn btn-sm" onclick="return confirm('Are you sure you want to delete this product and all its items?');">Delete</a>
-                            <a href="items.php?product_id=<?php echo $product['product_id']; ?>" class="btn btn-sm">Manage Items</a>
+                            <div class="mb-2 text-nowrap">
+                                <button class="btn btn-sm btn-primary" onclick="editProduct(<?php echo htmlspecialchars(json_encode($product)); ?>);">Edit</button>
+                                <a href="products.php?delete=<?php echo $product['product_id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this product and all its items?');">Delete</a>
+                            </div>
+                            <a href="items.php?product_id=<?php echo $product['product_id']; ?>" class="btn btn-sm btn-secondary ">Manage Items</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
+
 
         <!-- Pagination controls -->
         <nav>
@@ -212,7 +249,7 @@ if ($category_result) {
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         function clearProductForm() {
             document.getElementById('product_id').value = '';

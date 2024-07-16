@@ -49,6 +49,10 @@ $total_pages = ceil($total_rows / $limit);
             background-color: #343a40; /* Dark background color */
             color: white; /* White text color */
         }
+
+        .bg-pagi{
+            background-color: #333333;
+        }
     </style>
 </head>
 <body class="bg-dark text-white">
@@ -87,7 +91,22 @@ $total_pages = ceil($total_rows / $limit);
                     <td><?php echo $order['full_name']; ?></td>
                     <td><?php echo $order['order_date']; ?></td>
                     <td>₱<?php echo number_format($order['order_total'], 2); ?></td>
-                    <td><?php echo $order['order_status']; ?></td>
+                    <td>
+                        <form method="POST" action="update_order_status.php" class="d-inline">
+                            <input type="hidden" name="shop_order_id" value="<?php echo $order['shop_order_id']; ?>">
+                            <select name="order_status" class="custom-select custom-select-sm bg-secondary text-white" onchange="this.form.submit()">
+                                <option value="Delivered" <?php echo $order['order_status'] == 'Delivered' ? 'selected' : ''; ?>>Delivered</option>
+                                <option value="Cancelled" <?php echo $order['order_status'] == 'Cancelled' ? 'selected' : ''; ?>>Cancelled</option>
+                                <option value="Resolved" <?php echo $order['order_status'] == 'Resolved' ? 'selected' : ''; ?>>Resolved</option>
+                                <option value="Returned" <?php echo $order['order_status'] == 'Returned' ? 'selected' : ''; ?>>Returned</option>
+                                <option value="In Transit" <?php echo $order['order_status'] == 'In Transit' ? 'selected' : ''; ?>>In Transit</option>
+                                <option value="Payment Due" <?php echo $order['order_status'] == 'Payment Due' ? 'selected' : ''; ?>>Payment Due</option>
+                                <option value="Processing" <?php echo $order['order_status'] == 'Processing' ? 'selected' : ''; ?>>Processing</option>
+                                <option value="Ready for Pickup" <?php echo $order['order_status'] == 'Ready for Pickup' ? 'selected' : ''; ?>>Ready for Pickup</option>
+                                <option value="Problem" <?php echo $order['order_status'] == 'Problem' ? 'selected' : ''; ?>>Problem</option>
+                            </select>
+                        </form>
+                    </td>
                     <td><a href="order_details.php?shop_order_id=<?php echo $order['shop_order_id']; ?>" class="btn btn-primary btn-sm">View Details</a></td>
                 </tr>
                 <?php endforeach; ?>

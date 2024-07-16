@@ -2,6 +2,11 @@
 include '../db_connect.php';
 include 'navbar.php';
 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../login.php");
+    exit();
+}
+
 // Constants
 $rowPerPage = 12;
 
