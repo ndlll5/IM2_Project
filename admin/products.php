@@ -162,7 +162,7 @@ if ($category_result) {
         <table class="table table-dark table-striped">
             <thead>
                 <tr>
-                    <th>Product ID</th>
+                    <th class="text-nowrap pr-5">Product ID</th>
                     <th>Category</th>
                     <th>Name</th>
                     <th>Description</th>
@@ -183,7 +183,7 @@ if ($category_result) {
                                 <button class="btn btn-sm btn-primary" onclick="editProduct(<?php echo htmlspecialchars(json_encode($product)); ?>);">Edit</button>
                                 <a href="products.php?delete=<?php echo $product['product_id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this product and all its items?');">Delete</a>
                             </div>
-                            <a href="items.php?product_id=<?php echo $product['product_id']; ?>" class="btn btn-sm btn-secondary ">Manage Items</a>
+                            <a href="items.php?product_id=<?php echo $product['product_id']; ?>" class="btn btn-sm btn-secondary w-100">Manage Items</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
