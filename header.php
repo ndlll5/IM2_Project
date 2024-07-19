@@ -6,33 +6,60 @@
     <title>Motoracer</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="logstyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="assets/logo.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Titillium Web', sans-serif;
+        }
+        .navbar-custom {
+            background-color: #000000;
+        }
+        .navbar-custom .navbar-brand img {
+            height: 50px;
+        }
+        .navbar-custom .nav-link {
+            color: #ffffff;
+        }
+        .navbar-custom .nav-link:hover {
+            color: #ff0000;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .btn-custom {
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+        }
+        .btn-custom:hover {
+            background-color: darkred;
+        }
+    </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand ml-2" href="#">
-            <img src="assets/logo.png" height="55" class="d-inline-block align-top" alt="">
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <a class="navbar-brand ml-3" href="#">
+            <img src="assets/logo.png" alt="Motoracer Logo">
         </a>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin.php">Admin Dashboard</a>
+                        </li>
+                    <?php endif; ?>
+                <?php else: ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="admin.php">Admin Dashboard</a>
+                        <a class="nav-link" href="register.php">Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="login.php">Login</a>
                     </li>
                 <?php endif; ?>
-            <?php else: ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="register.php">Register</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="login.php">Login</a>
-                </li>
-            <?php endif; ?>
-        </ul>
-    </div>
-</nav>
-<div class="container mt-5 flex-grow-1">
+            </ul>
+        </div>
+    </nav>
+    <div class="container">

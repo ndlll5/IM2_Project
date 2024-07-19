@@ -1,5 +1,5 @@
 </div>
-<footer class="footer mt-auto py-3 bg-dark text-white">
+<footer class="footer mt-auto py-lg-5 bg-dark text-white">
     <div class="container text-center">
         <span>&copy; 2024 MotoRacer. All rights reserved.</span>
     </div>

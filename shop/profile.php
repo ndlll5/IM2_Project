@@ -2,9 +2,14 @@
 include 'navbar.php';
 include '../db_connect.php';
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
     
+    // Fetch user profile information
     $sql = "SELECT firstname, lastname, email FROM user WHERE user_id = ?";
     $stmt = $conn->prepare($sql);
 
@@ -60,7 +65,14 @@ if (isset($_SESSION['user_id'])) {
                     <!-- Display user's order history here -->
                     <?php
                     // Fetch user's order history from the database
-                    $order_sql = "SELECT shop_order_id, order_date, order_total FROM shop_order WHERE user_id = ?";
+                    $order_sql = "SELECT shop_order_id, order_date, order_total, order_status FROM shop_order WHERE user_id = ? 
+                                  ORDER BY 
+                                      CASE 
+                                          WHEN order_status = 'Completed' THEN 1 
+                                          ELSE 0 
+                                      END, 
+                                      order_date DESC, 
+                                      shop_order_id DESC";
                     $order_stmt = $conn->prepare($order_sql);
 
                     if ($order_stmt === false) {
@@ -75,17 +87,21 @@ if (isset($_SESSION['user_id'])) {
                         echo '<table class="table text-white">';
                         echo '<thead class="thead-dark">';
                         echo '<tr>';
-                        echo '<th scope="col">Order ID</th>';
+                        echo '<th scope="col" class="text-nowrap">Order ID</th>';
                         echo '<th scope="col">Date</th>';
                         echo '<th scope="col">Total</th>';
+                        echo '<th scope="col">Status</th>';
+                        echo '<th scope="col">Action</th>';
                         echo '</tr>';
                         echo '</thead>';
                         echo '<tbody>';
                         while ($order = $order_result->fetch_assoc()) {
                             echo '<tr>';
                             echo '<th scope="row">' . htmlspecialchars($order['shop_order_id']) . '</th>';
-                            echo '<td>' . htmlspecialchars($order['order_date']) . '</td>';
+                            echo '<td class="text-nowrap">' . htmlspecialchars($order['order_date']) . '</td>';
                             echo '<td>₱' . htmlspecialchars($order['order_total']) . '</td>';
+                            echo '<td>' . htmlspecialchars($order['order_status']) . '</td>';
+                            echo '<td><a href="order_details.php?shop_order_id=' . htmlspecialchars($order['shop_order_id']) . '" class="btn btn-info btn-sm text-nowrap">View Details</a></td>';
                             echo '</tr>';
                         }
                         echo '</tbody>';

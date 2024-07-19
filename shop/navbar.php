@@ -2,8 +2,8 @@
     session_start();
     include '../db_connect.php';
     $current_page = basename($_SERVER['PHP_SELF']);
-    $pages_without_search = ['contact.php', 'profile.php'];
-?>
+    $pages_without_search = ['contact.php', 'profile.php','cart.php','success.php'];
+    ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

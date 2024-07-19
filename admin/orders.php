@@ -6,14 +6,20 @@ $limit = 10; // Number of rows per page
 $page = isset($_GET['page']) ? $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 $search = isset($_GET['search']) ? $_GET['search'] : '';
+$filter_status = isset($_GET['filter_status']) ? $_GET['filter_status'] : '';
 
-// Fetch orders for display with search functionality
+// Fetch orders for display with search and status filter functionality
 $order_query = "SELECT shop_order.*, user.username, CONCAT(user.firstname, ' ', user.lastname) AS full_name 
                 FROM shop_order 
                 JOIN user ON shop_order.user_id = user.user_id 
-                WHERE user.username LIKE '%$search%' 
+                WHERE (user.username LIKE '%$search%' 
                 OR CONCAT(user.firstname, ' ', user.lastname) LIKE '%$search%' 
-                OR shop_order.order_status LIKE '%$search%'
+                OR shop_order.order_status LIKE '%$search%')
+                AND ('$filter_status' = '' OR shop_order.order_status = '$filter_status')
+                ORDER BY CASE 
+                    WHEN shop_order.order_status NOT IN ('Delivered', 'Cancelled', 'Resolved') THEN 1 
+                    ELSE 2 
+                END, shop_order.order_date DESC
                 LIMIT $limit OFFSET $offset";
 $order_result = mysqli_query($conn, $order_query);
 if ($order_result) {
@@ -27,9 +33,10 @@ if ($order_result) {
 $total_query = "SELECT COUNT(*) as total 
                 FROM shop_order 
                 JOIN user ON shop_order.user_id = user.user_id 
-                WHERE user.username LIKE '%$search%' 
+                WHERE (user.username LIKE '%$search%' 
                 OR CONCAT(user.firstname, ' ', user.lastname) LIKE '%$search%' 
-                OR shop_order.order_status LIKE '%$search%'";
+                OR shop_order.order_status LIKE '%$search%')
+                AND ('$filter_status' = '' OR shop_order.order_status = '$filter_status')";
 $total_result = mysqli_query($conn, $total_query);
 $total_rows = mysqli_fetch_assoc($total_result)['total'];
 $total_pages = ceil($total_rows / $limit);
@@ -50,7 +57,7 @@ $total_pages = ceil($total_rows / $limit);
             color: white; /* White text color */
         }
 
-        .bg-pagi{
+        .bg-pagi {
             background-color: #333333;
         }
     </style>
@@ -60,12 +67,30 @@ $total_pages = ceil($total_rows / $limit);
     <div class="container">
         <h1 class="mt-5">Orders</h1>
 
-        <div class="row">
-            <div class="col mb-3">
+        <div class="row mb-3">
+            <div class="col-md-6">
                 <!-- Search form -->
                 <form class="form-inline" method="GET" action="orders.php">
                     <input class="form-control mr-2" type="search" name="search" placeholder="Search orders" aria-label="Search" value="<?php echo htmlspecialchars($search); ?>">
                     <button class="btn btn-outline-light btn-sm" type="submit">Search</button>
+                </form>
+            </div>
+            <div class="col-md-6 text-right">
+                <!-- Filter form -->
+                <form class="form-inline" method="GET" action="orders.php">
+                    <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
+                    <select class="form-control mr-2" name="filter_status" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                        <option value="Delivered" <?php echo $filter_status == 'Delivered' ? 'selected' : ''; ?>>Delivered</option>
+                        <option value="Cancelled" <?php echo $filter_status == 'Cancelled' ? 'selected' : ''; ?>>Cancelled</option>
+                        <option value="Resolved" <?php echo $filter_status == 'Resolved' ? 'selected' : ''; ?>>Resolved</option>
+                        <option value="Returned" <?php echo $filter_status == 'Returned' ? 'selected' : ''; ?>>Returned</option>
+                        <option value="In Transit" <?php echo $filter_status == 'In Transit' ? 'selected' : ''; ?>>In Transit</option>
+                        <option value="Payment Due" <?php echo $filter_status == 'Payment Due' ? 'selected' : ''; ?>>Payment Due</option>
+                        <option value="Processing" <?php echo $filter_status == 'Processing' ? 'selected' : ''; ?>>Processing</option>
+                        <option value="Ready for Pickup" <?php echo $filter_status == 'Ready for Pickup' ? 'selected' : ''; ?>>Ready for Pickup</option>
+                        <option value="Problem" <?php echo $filter_status == 'Problem' ? 'selected' : ''; ?>>Problem</option>
+                    </select>
                 </form>
             </div>
         </div>
@@ -117,13 +142,13 @@ $total_pages = ceil($total_rows / $limit);
         <nav>
             <ul class="pagination justify-content-center">
                 <?php if ($page > 1): ?>
-                    <li class="page-item"><a class="page-link" href="orders.php?page=<?php echo $page - 1; ?>&search=<?php echo htmlspecialchars($search); ?>">Previous</a></li>
+                    <li class="page-item"><a class="page-link" href="orders.php?page=<?php echo $page - 1; ?>&search=<?php echo htmlspecialchars($search); ?>&filter_status=<?php echo htmlspecialchars($filter_status); ?>">Previous</a></li>
                 <?php endif; ?>
                 <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                    <li class="page-item <?php if ($i == $page) echo 'active'; ?>"><a class="page-link" href="orders.php?page=<?php echo $i; ?>&search=<?php echo htmlspecialchars($search); ?>"><?php echo $i; ?></a></li>
+                    <li class="page-item <?php if ($i == $page) echo 'active'; ?>"><a class="page-link" href="orders.php?page=<?php echo $i; ?>&search=<?php echo htmlspecialchars($search); ?>&filter_status=<?php echo htmlspecialchars($filter_status); ?>"><?php echo $i; ?></a></li>
                 <?php endfor; ?>
                 <?php if ($page < $total_pages): ?>
-                    <li class="page-item"><a class="page-link" href="orders.php?page=<?php echo $page + 1; ?>&search=<?php echo htmlspecialchars($search); ?>">Next</a></li>
+                    <li class="page-item"><a class="page-link" href="orders.php?page=<?php echo $page + 1; ?>&search=<?php echo htmlspecialchars($search); ?>&filter_status=<?php echo htmlspecialchars($filter_status); ?>">Next</a></li>
                 <?php endif; ?>
             </ul>
         </nav>

@@ -131,7 +131,7 @@
             <a class="side-bar-item text-nowrap" href="index.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a class="side-bar-item text-nowrap" href="products.php"><i class = "fas fa-box-open"></i> Products</a>
             <a class="side-bar-item text-nowrap" href="orders.php"><i class="fas fa-shopping-cart"></i> Orders</a>
-            <a class="side-bar-item text-nowrap" href="#"><i class="fas fa-credit-card"></i> Payments</a>
+            <a class="side-bar-item text-nowrap" href="payment.php"><i class="fas fa-credit-card"></i> Payments</a>
             <a class="side-bar-item text-nowrap" href="users.php"><i class="fas fa-users"></i> Users</a>
         </div>
     </div>
