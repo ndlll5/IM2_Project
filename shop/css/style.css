@@ -238,3 +238,16 @@ body {
     -webkit-appearance: none;
     margin: 0;
 }
+
+.btn-custom {
+    color: #fff; /* Red text */
+    background-color: #ff0000; /* Red Background */
+    border: none;
+}
+.btn-custom:hover {
+    background-color: darkred; /* Dark Red background on hover */
+    color: #fff; /* White text on hover */
+}
+.remove-item-btn{
+    border: none;
+}

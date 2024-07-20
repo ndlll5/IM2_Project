@@ -33,15 +33,14 @@
         .navbar-custom .form-inline .btn:focus {
             color: #ff0000; /* Red text on hover/focus */
         }
-        .navbar-custom .form-inline .btn-outline-danger {
-            color: #ff0000; /* Red text */
-            border-color: #ff0000; /* Red border */
+        .navbar-custom .form-inline .btn-custom {
+            color: #fff; /* Red text */
+            background-color: #ff0000; /* Red Background */
         }
-        .navbar-custom .form-inline .btn-outline-danger:hover {
-            background-color: #ff0000; /* Red background on hover */
+        .navbar-custom .form-inline .btn-custom:hover {
+            background-color: darkred; /* Red background on hover */
             color: #fff; /* White text on hover */
         }
-        
         .text-light:hover {
             color: #FFC107; 
         }
@@ -57,14 +56,14 @@
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <?php if (!in_array($current_page, $pages_without_search)): ?>
+        <!-- <?php if (!in_array($current_page, $pages_without_search)): ?>
             <div class="flex-grow-1 d-flex">
                 <form class="form-inline flex-nowrap mx-0 mx-lg-auto rounded p-1" action="shop.php" method="GET">
                     <input class="form-control mr-sm-2" type="search" placeholder="Search" name="search_query">
-                    <button class="btn btn-outline-danger" type="submit">Search</button>
+                    <button class="btn btn-custom" type="submit">Search</button>
                 </form>
             </div>
-        <?php endif; ?>
+        <?php endif; ?> -->
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item active">
                     <a class="nav-link" href="contact.php">Contact<span class="sr-only">(current)</span></a>

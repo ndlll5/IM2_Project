@@ -26,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 
-<div class="container">
     <h2 class="text-center">Register</h2>
     <form action="register.php" method="post">
         <div class="form-group">
@@ -51,6 +50,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
         <button type="submit" class="btn btn-custom">Register</button>
     </form>
-</div>
 
 <?php include 'footer.php'; ?>

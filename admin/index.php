@@ -181,7 +181,7 @@ if ($result) {
                 ?>
                     <div class="card card-custom border-0 <?php echo $hiddenClass; ?>">
                         <div class="card-body text-center">
-                            <h5 class="card-title"><?php echo $status; ?> Orders</h5>
+                            <h5 class="card-title"><?php echo $status; ?></h5>
                             <h3 class="card-text"><?php echo $count; ?></h3>
                         </div>
                     </div>

@@ -131,9 +131,56 @@ if ($category_result) {
     <link href="assets/css/styles.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
+        body {
+            background-color: #212529; /* Dark background color */
+        }
+
+        .table {
+            background-color: #343a40; /* Darker background for the table */
+        }
+
+
+        .pagination .page-item .page-link {
+            color: #f00; /* Red text color for page links */
+            background-color: #343a40; /* Dark background for page links */
+            border-color: #f00; /* Red border color */
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #f00; /* Red background for active page */
+            color: #fff; /* White text color for active page */
+            border-color: #f00; /* Red border color */
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d; /* Gray color for disabled page links */
+            background-color: #343a40; /* Dark background for disabled page links */
+            border-color: #343a40; /* Dark border color for disabled page links */
+        }
+
+        .btn-outline-light {
+            color: #f00; /* Red text color */
+            border-color: #f00; /* Red border color */
+        }
+
+        .btn-outline-light:hover {
+            background-color: #f00; /* Red background color on hover */
+            color: #fff; /* White text color on hover */
+        }
+
         .modal-content {
-            background-color: #343a40; /* Dark background color */
-            color: white; /* White text color */
+            background-color: #343a40; /* Dark background color for modal */
+            color: #fff; /* White text color for modal */
+        }
+
+        .btn {
+            background-color: #f00; /* Red background for buttons */
+            color: #fff; /* White text color for buttons */
+        }
+
+        .btn:hover {
+            background-color: #c00; /* Darker red on hover */
+            color: #fff; /* White text color on hover */
         }
     </style>
 </head>
@@ -189,7 +236,6 @@ if ($category_result) {
                 <?php endforeach; ?>
             </tbody>
         </table>
-
 
         <!-- Pagination controls -->
         <nav>
@@ -249,7 +295,7 @@ if ($category_result) {
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         function clearProductForm() {
             document.getElementById('product_id').value = '';
@@ -269,3 +315,4 @@ if ($category_result) {
     <?php include 'footer.php'; ?>
 </body>
 </html>
+

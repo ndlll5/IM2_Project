@@ -172,7 +172,7 @@ function processPayment(paymentMethod) {
     var paymentSuccessful = true; // Simulate payment success
 
     if (paymentSuccessful) {
-        var paymentStatus = (paymentMethod == 1) ? "Paid" : "Pending";
+        var paymentStatus = (paymentMethod == 1) ? "Paid" : "Pending"; // Assuming 1 is Credit Card and 4 is Bank Transfer
         var paymentDate = (paymentMethod == 1) ? new Date().toISOString().slice(0, 19).replace('T', ' ') : null;
 
         console.log("Payment Method:", paymentMethod);
@@ -195,6 +195,7 @@ function processPayment(paymentMethod) {
     }
 }
 </script>
+
 
 
 </body>

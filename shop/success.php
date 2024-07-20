@@ -75,7 +75,7 @@ $lineItemsResult = $lineItemsQuery->get_result();
                 <?php } ?>
             </tbody>
         </table>
-        <a href="shop.php" class="btn btn-primary">Continue Shopping</a>
+        <a href="shop.php" class="btn btn-custom">Continue Shopping</a>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

@@ -52,6 +52,33 @@ $total_pages = ceil($total_rows / $limit);
     <link href="assets/css/styles.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
+        .pagination .page-item .page-link {
+            color: #f00; /* Red text color for page links */
+            background-color: #343a40; /* Dark background for page links */
+            border-color: #f00; /* Red border color */
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #f00; /* Red background for active page */
+            color: #fff; /* White text color for active page */
+            border-color: #f00; /* Red border color */
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d; /* Gray color for disabled page links */
+            background-color: #343a40; /* Dark background for disabled page links */
+            border-color: #343a40; /* Dark border color for disabled page links */
+        }
+
+        .btn-outline-light {
+            color: #f00; /* Red text color */
+            border-color: #f00; /* Red border color */
+        }
+
+        .btn-outline-light:hover {
+            background-color: #f00; /* Red background color on hover */
+            color: #fff; /* White text color on hover */
+        }
         .modal-content {
             background-color: #343a40; /* Dark background color */
             color: white; /* White text color */
@@ -75,12 +102,12 @@ $total_pages = ceil($total_rows / $limit);
                     <button class="btn btn-outline-light btn-sm" type="submit">Search</button>
                 </form>
             </div>
-            <div class="col-md-6 text-right">
+            <div class="col-md-6">
                 <!-- Filter form -->
-                <form class="form-inline" method="GET" action="orders.php">
+                <form class="form-inline justify-content-end" method="GET" action="orders.php">
                     <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
                     <select class="form-control mr-2" name="filter_status" onchange="this.form.submit()">
-                        <option value="">All Statuses</option>
+                        <option value="">Status</option>
                         <option value="Delivered" <?php echo $filter_status == 'Delivered' ? 'selected' : ''; ?>>Delivered</option>
                         <option value="Cancelled" <?php echo $filter_status == 'Cancelled' ? 'selected' : ''; ?>>Cancelled</option>
                         <option value="Resolved" <?php echo $filter_status == 'Resolved' ? 'selected' : ''; ?>>Resolved</option>
@@ -90,6 +117,7 @@ $total_pages = ceil($total_rows / $limit);
                         <option value="Processing" <?php echo $filter_status == 'Processing' ? 'selected' : ''; ?>>Processing</option>
                         <option value="Ready for Pickup" <?php echo $filter_status == 'Ready for Pickup' ? 'selected' : ''; ?>>Ready for Pickup</option>
                         <option value="Problem" <?php echo $filter_status == 'Problem' ? 'selected' : ''; ?>>Problem</option>
+                        <option value="Problem" <?php echo $filter_status == 'Problem' ? 'selected' : ''; ?>>Completed</option>
                     </select>
                 </form>
             </div>
@@ -129,6 +157,7 @@ $total_pages = ceil($total_rows / $limit);
                                 <option value="Processing" <?php echo $order['order_status'] == 'Processing' ? 'selected' : ''; ?>>Processing</option>
                                 <option value="Ready for Pickup" <?php echo $order['order_status'] == 'Ready for Pickup' ? 'selected' : ''; ?>>Ready for Pickup</option>
                                 <option value="Problem" <?php echo $order['order_status'] == 'Problem' ? 'selected' : ''; ?>>Problem</option>
+                                <option value="Completed" <?php echo $order['order_status'] == 'Completed' ? 'selected' : ''; ?>>Completed</option>
                             </select>
                         </form>
                     </td>

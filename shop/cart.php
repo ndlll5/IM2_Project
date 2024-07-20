@@ -20,8 +20,6 @@ foreach ($cartItems as $item) {
     $totalAmount += $itemDetails['price'] * $item['quantity'];
 }
 
-$cartItemsCount = count($cartItems);
-
 function isValidPhoneNumber($phoneNumber) {
     return preg_match('/^09[0-9]{9}$/', $phoneNumber);
 }
@@ -145,7 +143,10 @@ if (isset($_POST['checkout'])) {
                         <td>₱<?php echo htmlspecialchars(number_format($itemDetails['price'], 2)); ?></td>
                         <td><?php echo htmlspecialchars($item['quantity']); ?></td>
                         <td>₱<?php echo htmlspecialchars(number_format($itemTotal, 2)); ?></td>
-                        <td><button class="btn btn-danger btn-sm remove-item-btn" data-item-id="<?php echo htmlspecialchars($item['item_id']); ?>">Remove</button></td>
+                        <td>
+                            <button class="btn btn-warning btn-sm edit-quantity-btn" data-item-id="<?php echo htmlspecialchars($item['item_id']); ?>" data-quantity="<?php echo htmlspecialchars($item['quantity']); ?>" data-toggle="modal" data-target="#editQuantityModal">Edit Quantity</button>
+                            <button class="btn btn-danger btn-sm remove-item-btn" data-item-id="<?php echo htmlspecialchars($item['item_id']); ?>">Remove</button>
+                        </td>
                     </tr>
                     <?php
                 }
@@ -158,6 +159,34 @@ if (isset($_POST['checkout'])) {
         </div>
     </div>
 
+    <!-- Edit Quantity Modal -->
+    <div class="modal fade" id="editQuantityModal" tabindex="-1" aria-labelledby="editQuantityModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editQuantityModalLabel">Edit Quantity</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="editQuantityForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="edit_item_id" name="item_id">
+                        <div class="form-group">
+                            <label for="edit_quantity">New Quantity:</label>
+                            <input type="number" class="form-control" id="edit_quantity" name="quantity" min="1" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Update Quantity</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
     <div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content bg-dark text-white">
@@ -213,44 +242,83 @@ if (isset($_POST['checkout'])) {
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $('#fulfillment_method').change(function() {
-                if ($(this).val() == 2) {
-                    $('#shippingAddressField').show();
-                } else {
-                    $('#shippingAddressField').hide();
-                }
-            });
+    $(document).ready(function() {
+        $('#fulfillment_method').change(function() {
+            if ($(this).val() == 2) {
+                $('#shippingAddressField').show();
+            } else {
+                $('#shippingAddressField').hide();
+            }
+        });
 
-            $('#useStoredName').change(function() {
-                if ($(this).is(':checked')) {
-                    $('#receiver').val("<?php echo htmlspecialchars($userFullName); ?>");
-                    $('#receiver').prop('disabled', true);
-                } else {
-                    $('#receiver').val('');
-                    $('#receiver').prop('disabled', false);
-                }
-            });
+        $('#useStoredName').change(function() {
+            if ($(this).is(':checked')) {
+                $('#receiver').val("<?php echo htmlspecialchars($userFullName); ?>");
+                $('#receiver').prop('disabled', true);
+            } else {
+                $('#receiver').val('');
+                $('#receiver').prop('disabled', false);
+            }
+        });
 
-            $('.remove-item-btn').click(function() {
-                var itemId = $(this).data('item-id');
-                $.ajax({
-                    url: 'remove_from_cart.php',
-                    method: 'POST',
-                    data: { item_id: itemId },
-                    success: function(response) {
+        $('.remove-item-btn').click(function() {
+            var itemId = $(this).data('item-id');
+            console.log('Removing item with ID:', itemId); // Debug statement
+            $.ajax({
+                url: 'remove_from_cart.php',
+                method: 'POST',
+                data: { item_id: itemId },
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Remove item response:', response); // Debug statement
+                    if (response.status === 'success') {
                         location.reload();
-                    },
-                    error: function() {
-                        alert('Failed to remove item from cart.');
+                    } else {
+                        alert(response.message);
                     }
-                });
+                },
+                error: function(xhr, status, error) {
+                    console.log('AJAX Error:', status, error); // Debug statement
+                    alert('Failed to remove item from cart.');
+                }
             });
         });
+
+        $('.edit-quantity-btn').click(function() {
+            var itemId = $(this).data('item-id');
+            var quantity = $(this).data('quantity');
+            $('#edit_item_id').val(itemId);
+            $('#edit_quantity').val(quantity);
+        });
+
+        $('#editQuantityForm').submit(function(event) {
+            event.preventDefault();
+            var itemId = $('#edit_item_id').val();
+            var quantity = $('#edit_quantity').val();
+            $.ajax({
+                url: 'edit_quantity.php',
+                method: 'POST',
+                data: { item_id: itemId, quantity: quantity },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('AJAX Error:', status, error);
+                    alert('Failed to update item quantity.');
+                }
+            });
+        });
+    });
     </script>
+
 </body>
 </html>

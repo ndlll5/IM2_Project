@@ -99,6 +99,7 @@ if ($resultItems->num_rows > 0) {
                             <option value="Processing" <?php echo $order['order_status'] == 'Processing' ? 'selected' : ''; ?>>Processing</option>
                             <option value="Ready for Pickup" <?php echo $order['order_status'] == 'Ready for Pickup' ? 'selected' : ''; ?>>Ready for Pickup</option>
                             <option value="Problem" <?php echo $order['order_status'] == 'Problem' ? 'selected' : ''; ?>>Problem</option>
+                            <option value="Completed" <?php echo $order['order_status'] == 'Completed' ? 'selected' : ''; ?>>Completed</option>
                         </select>
                     </form>
                 </p>
